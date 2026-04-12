@@ -1,0 +1,21 @@
+{
+  "name": "vaultx-backend",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "@supabase/supabase-js": "^2.49.4",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express-rate-limit": "^7.5.0",
+    "express-validator": "^7.2.1"
+  }
+}
