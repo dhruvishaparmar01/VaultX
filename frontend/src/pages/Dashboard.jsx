@@ -78,15 +78,15 @@ export default function Dashboard() {
     setPasswords(data || []);
   };
 
-  const loadActivity = async () => {
-    const { data } = await supabase
-      .from('activity_logs')
-      .select('id, action, metadata, timestamp')
-      .eq('user_id', user.id)
-      .order('timestamp', { ascending: false })
-      .limit(10);
-    setActivities(data || []);
-  };
+const loadActivity = async () => {
+  const { data } = await supabase
+    .from('activity_logs')
+    .select('id, action, metadata, created_at')   // ← changed
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })     // ← changed
+    .limit(10);
+  setActivities(data || []);
+};
 
   const displayName = profile
     ? [profile.first_name, profile.last_name]
