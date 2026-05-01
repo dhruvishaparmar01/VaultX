@@ -19,11 +19,12 @@ export default function Dashboard() {
   const [passwords, setPasswords] = useState([]);
   const [activities, setActivities] = useState([]);
 
-  useEffect(() => {
-    if (!user) return;
-    loadAll();
-  }, [user]);
-
+ useEffect(() => {
+  pingBackend(); // Wake Render backend immediately on app load
+  if (!user) return;
+  loadAll();
+}, [user]);
+  
   const loadAll = async () => {
     setDashLoading(true);
     try {
