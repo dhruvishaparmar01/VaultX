@@ -37,14 +37,26 @@ async function handleResponse(res) {
   return data;
 }
 
-// ─── Encrypt (no auth required) ───
 export async function encryptPassword(password) {
-  const res = await fetch(`${BASE_URL}/api/encrypt`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password })
-  });
-  return handleResponse(res);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000); // 15 sec timeout
+
+  try {
+    const res = await fetch(`${BASE_URL}/api/encrypt`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password }),
+      signal: controller.signal
+    });
+    return handleResponse(res);
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('Backend is starting up, please try again in 30 seconds.');
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 // ─── Vault ───
