@@ -20,7 +20,6 @@ router.post('/', encryptLimiter, encryptValidation, async (req, res, next) => {
 
     const { password } = req.body;
 
-    // Run all three operations
     const encrypted = hmacEncrypt(password);
     const strength = checkPasswordStrength(password);
     const breached = await hibpCheck(password);
@@ -40,3 +39,5 @@ router.post('/', encryptLimiter, encryptValidation, async (req, res, next) => {
 });
 
 module.exports = router;
+
+   
