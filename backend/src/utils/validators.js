@@ -1,4 +1,4 @@
-const { body, param, query } = require('express-validator');
+const { body } = require('express-validator');
 
 const encryptValidation = [
   body('password')
@@ -14,7 +14,7 @@ const vaultSaveValidation = [
     .trim()
     .isLength({ max: 100 }).withMessage('Site name too long'),
   body('category')
-  body('category').isIn(['email', 'banking', 'social_media', 'work', 'others', 'other', 'shopping', 'entertainment']) 
+    .isIn(['email', 'banking', 'social_media', 'work', 'others', 'other', 'shopping', 'entertainment'])
     .withMessage('Invalid category'),
   body('saveType')
     .isIn(['original', 'encrypted', 'both'])
