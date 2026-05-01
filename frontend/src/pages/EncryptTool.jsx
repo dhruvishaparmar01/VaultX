@@ -49,34 +49,40 @@ export default function EncryptTool() {
   // H1: Debounced password value — API calls only fire after 400ms of no typing
   const debouncedPassword = useDebounce(password, 400);
 
-  // H1: Encrypt handler wrapped in useCallback to satisfy hook deps
-  const handleEncrypt = useCallback(async (value) => {
-    try {
-      const result = await encryptPassword(value);
-      if (result.success) {
-        setEncrypted(result.data.encrypted);
-        setStrength(result.data.strength);
-        setBreached(result.data.breached);
+const handleEncrypt = useCallback(async (value) => {
+  try {
+    const result = await encryptPassword(value);
+    if (result.success) {
+      setEncrypted(result.data.encrypted);
+      setStrength(result.data.strength);
+      setBreached(result.data.breached);
 
-        // Get AI suggestions for weak/fair passwords
-        if (result.data.strength.label === 'Weak' || result.data.strength.label === 'Fair' || result.data.strength.label === 'Too Common') {
-          setAiLoading(true);
-          try {
-            const aiRes = await getAiSuggestions(value, result.data.strength);
-            if (aiRes.success) setAiSuggestions(aiRes.data.suggestions);
-          } catch {
-            setAiSuggestions(result.data.strength.suggestions || []);
-          } finally {
-            setAiLoading(false);
-          }
-        } else {
-          setAiSuggestions([]);
+      if (
+        result.data.strength.label === 'Weak' ||
+        result.data.strength.label === 'Fair' ||
+        result.data.strength.label === 'Too Common'
+      ) {
+        setAiLoading(true);
+        try {
+          const aiRes = await getAiSuggestions(value, result.data.strength);
+          if (aiRes.success) setAiSuggestions(aiRes.data.suggestions);
+        } catch {
+          setAiSuggestions(result.data.strength.suggestions || []);
+        } finally {
+          setAiLoading(false);
         }
+      } else {
+        setAiSuggestions([]);
       }
-    } catch {
-      // Silent fail — keep previous state
     }
-  }, []);
+  } catch (err) {
+    // Show error instead of silently failing
+    addToast('Encrypt failed: ' + (err.message || 'Backend not responding'), 'error');
+    setEncrypted('');
+    setStrength(null);
+    setBreached(null);
+  }
+}, [addToast]);
 
   // H1: Run encrypt API when debounced value changes
   useEffect(() => {
