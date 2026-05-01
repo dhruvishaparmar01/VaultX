@@ -6,10 +6,13 @@ const { vaultSaveValidation, vaultRevealValidation } = require('../utils/validat
 const { verifyToken } = require('../middleware/auth');
 const { generalLimiter } = require('../middleware/rateLimiter');
 
-const router = express.Router();
+const router = express.Router()
 
 function getSupabase() {
-  return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
+  return createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
+  );
 }
 
 // Fire-and-forget activity logging — never blocks response
