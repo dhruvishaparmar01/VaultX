@@ -224,9 +224,11 @@ router.delete('/delete', verifyToken, generalLimiter, async (req, res, next) => 
 });
 
 // GET /api/vault/export
+// GET /api/vault/export
 router.get('/export', verifyToken, generalLimiter, async (req, res, next) => {
   try {
     const userId = req.user.id;
+    const format = req.query.format || 'csv';
     const supabase = getSupabase();
 
     const { data, error } = await supabase
@@ -238,19 +240,33 @@ router.get('/export', verifyToken, generalLimiter, async (req, res, next) => {
       return res.status(500).json({ success: false, error: 'Failed to export', code: 'DATABASE_ERROR' });
     }
 
-    const exportData = JSON.stringify({ passwords: data, exportedAt: new Date().toISOString() }, null, 2);
+    if (format === 'csv') {
+      const headers = ['Site Name', 'Category', 'Encrypted Version', 'Save Type', 'Created At'];
+      const rows = data.map(p => [
+        `"${p.site_name || ''}"`,
+        `"${p.category || ''}"`,
+        `"${p.encrypted_version || ''}"`,
+        `"${p.save_type || ''}"`,
+        `"${new Date(p.created_at).toLocaleString()}"`
+      ].join(','));
 
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', 'attachment; filename=vaultx-export.json');
-    res.send(exportData);
+      const csv = [headers.join(','), ...rows].join('\n');
 
-    // Fire and forget activity log
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=vaultx-export.csv');
+      res.send(csv);
+    } else {
+      const exportData = JSON.stringify({ passwords: data, exportedAt: new Date().toISOString() }, null, 2);
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', 'attachment; filename=vaultx-export.json');
+      res.send(exportData);
+    }
+
     logActivity(supabase, userId, 'exported', { count: data.length });
   } catch (error) {
     next(error);
   }
 });
-
 // DELETE /api/vault/clear-all
 router.delete('/clear-all', verifyToken, generalLimiter, async (req, res, next) => {
   try {
