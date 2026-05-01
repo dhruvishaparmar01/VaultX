@@ -1,3 +1,4 @@
+import { pingBackend } from '../services/api';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
