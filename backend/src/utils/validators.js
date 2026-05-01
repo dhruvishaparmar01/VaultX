@@ -14,7 +14,7 @@ const vaultSaveValidation = [
     .trim()
     .isLength({ max: 100 }).withMessage('Site name too long'),
   body('category')
-    .isIn(['email', 'banking', 'social_media', 'work', 'others'])
+  body('category').isIn(['email', 'banking', 'social_media', 'work', 'others', 'other', 'shopping', 'entertainment']) 
     .withMessage('Invalid category'),
   body('saveType')
     .isIn(['original', 'encrypted', 'both'])
